@@ -14,6 +14,10 @@ import { cn } from "../utils/classnames";
 interface TabsProps {
   /** ユーザーレベル */
   level: number;
+  /** 目標の一の位 */
+  targetDigit: number;
+  /** 目標の一の位変更ハンドラ */
+  onTargetDigitChange: (value: number) => void;
 }
 
 // =============================================================================
@@ -56,17 +60,17 @@ const tabPanelStyles = [
  * タブコンポーネント
  * 3つの機能（現在スコア判定、攻略方法提案、目標達成スコア一覧）を切り替える
  */
-export default function Tabs({ level }: TabsProps) {
+export default function Tabs({ level, targetDigit, onTargetDigitChange }: TabsProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   // タブパネルの内容をメモ化
   const panels = useMemo(
     () => [
-      <CurrentCheck key="current-check" level={level} />,
-      <StrategySuggest key="strategy-suggest" level={level} />,
-      <TargetList key="target-list" level={level} />,
+      <CurrentCheck key="current-check" level={level} targetDigit={targetDigit} onTargetDigitChange={onTargetDigitChange} />,
+      <StrategySuggest key="strategy-suggest" level={level} targetDigit={targetDigit} onTargetDigitChange={onTargetDigitChange} />,
+      <TargetList key="target-list" level={level} targetDigit={targetDigit} onTargetDigitChange={onTargetDigitChange} />,
     ],
-    [level]
+    [level, targetDigit, onTargetDigitChange]
   );
 
   return (

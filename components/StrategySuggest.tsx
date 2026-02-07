@@ -1,4 +1,5 @@
 "use client";
+"use client";
 import { useEffect, useState, useCallback, useMemo, ChangeEvent } from "react";
 import { findTsumCandidates, CHAIN_SCORE, TsumCandidate } from "../utils/calculators";
 import { INPUT_LIMITS, CHAIN_CONFIG, DISPLAY_CONFIG, TSUM_SCORE_INFO } from "../constants/config";
@@ -14,6 +15,10 @@ import Button from "./ui/Button";
 interface StrategySuggestProps {
   /** ユーザーレベル */
   level: number;
+  /** 目標の一の位 */
+  targetDigit: number;
+  /** 目標の一の位変更ハンドラ */
+  onTargetDigitChange: (value: number) => void;
 }
 
 // =============================================================================
@@ -22,7 +27,6 @@ interface StrategySuggestProps {
 
 const LABELS = {
   paramSection: "攻略パラメータ",
-  targetDigit: "目標の一の位",
   maxTsumScore: "探索最大ツムスコア",
   userLevel: "ユーザーレベル",
   chain: "チェーン",
@@ -138,8 +142,7 @@ function ChainResultCard({ chainCount, candidates, maxDisplay }: ChainResultCard
  * 攻略方法提案コンポーネント
  * チェーン数ごとに目標達成に必要なツムスコアを探索
  */
-export default function StrategySuggest({ level }: StrategySuggestProps) {
-  const [targetDigit, setTargetDigit] = useState<number>(INPUT_LIMITS.targetDigit.default);
+export default function StrategySuggest({ level, targetDigit, onTargetDigitChange }: StrategySuggestProps) {
   const [maxTsumScore, setMaxTsumScore] = useState<number>(INPUT_LIMITS.tsumScore.default);
   const [results, setResults] = useState<Record<number, TsumCandidate[]>>({});
 
@@ -153,16 +156,6 @@ export default function StrategySuggest({ level }: StrategySuggestProps) {
     );
     setResults(res);
   }, [level, targetDigit, maxTsumScore]);
-
-  // イベントハンドラ
-  const handleTargetChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const value = Number(e.target.value);
-    const clampedValue = Math.max(
-      INPUT_LIMITS.targetDigit.min,
-      Math.min(INPUT_LIMITS.targetDigit.max, value)
-    );
-    setTargetDigit(clampedValue);
-  }, []);
 
   const handleMaxTsumChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value);
@@ -180,15 +173,7 @@ export default function StrategySuggest({ level }: StrategySuggestProps) {
           🎯 {LABELS.paramSection}
         </h3>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <NumberInput
-            label={LABELS.targetDigit}
-            min={INPUT_LIMITS.targetDigit.min}
-            max={INPUT_LIMITS.targetDigit.max}
-            value={targetDigit}
-            onChange={handleTargetChange}
-          />
-          
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <NumberInput
             label={LABELS.maxTsumScore}
             min={INPUT_LIMITS.tsumScore.searchMin}

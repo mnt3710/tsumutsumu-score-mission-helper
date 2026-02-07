@@ -14,6 +14,10 @@ import Button from "./ui/Button";
 interface TargetListProps {
   /** ユーザーレベル */
   level: number;
+  /** 目標の一の位 */
+  targetDigit: number;
+  /** 目標の一の位変更ハンドラ */
+  onTargetDigitChange: (value: number) => void;
 }
 
 // =============================================================================
@@ -22,7 +26,6 @@ interface TargetListProps {
 
 const LABELS = {
   paramSection: "検索パラメータ",
-  targetDigit: "目標の一の位",
   searchLimit: "探索上限（基礎スコア）",
   step: "ステップ",
   userLevel: "ユーザーレベル",
@@ -46,8 +49,7 @@ const STEP_OPTIONS = DISPLAY_CONFIG.stepOptions.map((opt) => ({
  * 目標達成スコア一覧コンポーネント
  * 指定した一の位を達成できる基礎スコアの一覧を表示
  */
-export default function TargetList({ level }: TargetListProps) {
-  const [targetDigit, setTargetDigit] = useState<number>(INPUT_LIMITS.targetDigit.default);
+export default function TargetList({ level, targetDigit, onTargetDigitChange }: TargetListProps) {
   const [searchLimit, setSearchLimit] = useState<number>(INPUT_LIMITS.baseScore.searchLimit);
   const [step, setStep] = useState<number>(10);
   const [results, setResults] = useState<ScorePair[]>([]);
@@ -59,15 +61,6 @@ export default function TargetList({ level }: TargetListProps) {
   }, [level, targetDigit, searchLimit, step]);
 
   // イベントハンドラ
-  const handleTargetChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const value = Number(e.target.value);
-    const clampedValue = Math.max(
-      INPUT_LIMITS.targetDigit.min,
-      Math.min(INPUT_LIMITS.targetDigit.max, value)
-    );
-    setTargetDigit(clampedValue);
-  }, []);
-
   const handleLimitChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value);
     setSearchLimit(Math.max(100, value));
@@ -96,15 +89,7 @@ export default function TargetList({ level }: TargetListProps) {
           ✨ {LABELS.paramSection}
         </h3>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <NumberInput
-            label={LABELS.targetDigit}
-            min={INPUT_LIMITS.targetDigit.min}
-            max={INPUT_LIMITS.targetDigit.max}
-            value={targetDigit}
-            onChange={handleTargetChange}
-          />
-          
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <NumberInput
             label={LABELS.searchLimit}
             min={100}

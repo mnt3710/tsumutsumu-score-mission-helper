@@ -14,6 +14,10 @@ import Button from "./ui/Button";
 interface CurrentCheckProps {
   /** ユーザーレベル */
   level: number;
+  /** 目標の一の位 */
+  targetDigit: number;
+  /** 目標の一の位変更ハンドラ */
+  onTargetDigitChange: (value: number) => void;
 }
 
 interface CheckResult {
@@ -28,8 +32,6 @@ interface CheckResult {
 const LABELS = {
   inputSection: "入力設定",
   baseScore: "現在の基礎スコア",
-  targetDigit: "目標の一の位",
-  userLevel: "ユーザーレベル",
   finalScore: "最終スコア",
   judgement: "一の位判定",
   match: "目標と一致",
@@ -46,10 +48,9 @@ const LABELS = {
  * 現在スコア判定コンポーネント
  * 基礎スコアから最終スコアを計算し、一の位が目標と一致するか判定
  */
-export default function CurrentCheck({ level }: CurrentCheckProps) {
+export default function CurrentCheck({ level, targetDigit, onTargetDigitChange }: CurrentCheckProps) {
   // 状態管理
   const [baseScore, setBaseScore] = useState<number | "">("");
-  const [targetDigit, setTargetDigit] = useState<number>(INPUT_LIMITS.targetDigit.default);
   const [result, setResult] = useState<CheckResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -79,18 +80,8 @@ export default function CurrentCheck({ level }: CurrentCheckProps) {
     setBaseScore(value === "" ? "" : Number(value));
   }, []);
 
-  const handleTargetChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const value = Number(e.target.value);
-    const clampedValue = Math.max(
-      INPUT_LIMITS.targetDigit.min,
-      Math.min(INPUT_LIMITS.targetDigit.max, value)
-    );
-    setTargetDigit(clampedValue);
-  }, []);
-
   const handleReset = useCallback(() => {
     setBaseScore("");
-    setTargetDigit(INPUT_LIMITS.targetDigit.default);
   }, []);
 
   const handleCopyScore = useCallback(() => {
@@ -107,31 +98,12 @@ export default function CurrentCheck({ level }: CurrentCheckProps) {
           📊 {LABELS.inputSection}
         </h3>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <NumberInput
-            label={LABELS.baseScore}
-            min={INPUT_LIMITS.baseScore.min}
-            value={baseScore}
-            onChange={handleBaseScoreChange}
-          />
-          
-          <NumberInput
-            label={LABELS.targetDigit}
-            min={INPUT_LIMITS.targetDigit.min}
-            max={INPUT_LIMITS.targetDigit.max}
-            value={targetDigit}
-            onChange={handleTargetChange}
-          />
-          
-          <div className="relative">
-            <div className="w-full px-4 py-3 text-base font-medium bg-slate-50 border border-slate-200 rounded-xl text-slate-700">
-              {level}
-            </div>
-            <span className="absolute -top-2.5 left-3 px-1 text-xs font-medium text-slate-500 bg-white">
-              {LABELS.userLevel}
-            </span>
-          </div>
-        </div>
+        <NumberInput
+          label={LABELS.baseScore}
+          min={INPUT_LIMITS.baseScore.min}
+          value={baseScore}
+          onChange={handleBaseScoreChange}
+        />
       </section>
 
       {/* エラーメッセージ */}

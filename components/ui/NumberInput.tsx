@@ -22,7 +22,7 @@ const inputStyles = [
   "text-base font-medium",
   "bg-white",
   "border border-slate-200",
-  "rounded-xl",
+  "rounded-lg",
   "transition-all duration-200",
   "placeholder:text-slate-400",
   // Focus状態
