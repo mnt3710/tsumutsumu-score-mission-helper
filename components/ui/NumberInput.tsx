@@ -85,6 +85,7 @@ export default function NumberInput({
           error && "border-red-400 focus:border-red-400 focus:ring-red-100",
           className
         )}
+        onWheel={(e) => e.currentTarget.blur()}
         {...rest}
       />
       
